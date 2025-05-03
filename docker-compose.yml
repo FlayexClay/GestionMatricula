@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  sqlserver_app_matricula:
+   image: mcr.microsoft.com/mssql/server:2022-latest
+   container_name: bd_gestion
+   restart: always
+   environment:
+    MSSQL_SA_PASSWORD: Admin123
+    MSSQL_PID: Express
+    ACCEPT_EULA: Y
+   volumes:
+     - C:/Users/elfla/Documents/Docker/Volumenes/sqlserver_gestion:/var/opt/mssql/data
+   ports:
+    - 1404:1433

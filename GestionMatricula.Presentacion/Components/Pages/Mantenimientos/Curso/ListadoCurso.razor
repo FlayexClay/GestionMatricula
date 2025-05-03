@@ -1,0 +1,61 @@
+﻿@using GestionMatricula.Dto
+@using GestionMatricula.Servicio.Interfaces
+@attribute [Route(Rutas.Curso)]
+@inject ICursoService CursoService
+@inject NavigationManager navigationManager
+
+<h3>Listado de Cursos</h3>
+
+<button class="btn btn-primary mb-3" @onclick="AgregarCurso">Agregar Curso</button>
+
+@if (cursos == null)
+{
+	<p><em>Cargando...</em></p>
+} else if (!cursos.Any())
+{ 
+	<p><em>No hay cursos registrados.</em></p>
+}
+else
+{
+	<table class="table table-striped table-bordered">
+		<thead class="thead-dark">
+			<tr>
+				<th>ID</th>
+				<th>Nombre</th>
+				<th>Descripcion</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var item in cursos)
+			{
+				<tr>
+					<td>@item.Id</td>
+					<td>@item.Nombre</td>
+					<td>@item.Descripcion</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+
+@code {
+	private IEnumerable<CursoDto> cursos;
+
+	protected override async Task OnInitializedAsync()
+	{ 
+		try
+		{
+			cursos = await CursoService.ObtenerTodosLosCursosAsync();
+		}
+		catch (Exception ex)
+		{
+			
+			Console.WriteLine($"Error al obtener los cursos: {ex.Message}");
+		}
+	}
+
+	private void AgregarCurso()
+	{
+		navigationManager.NavigateTo(Rutas.CursoNuevo);
+	}
+}

@@ -1,0 +1,110 @@
+﻿@using GestionMatricula.Dto
+@using GestionMatricula.Servicio.Interfaces
+@attribute [Route(Rutas.Matricula)]
+@inject NavigationManager NavigationManager
+@inject IMatriculaService MatriculaService
+
+<h3>Listado Matricula</h3>
+
+<button class="btn btn-primary mb-3" @onclick="AgregarMatricula">Agregar Matricula</button>
+
+@if (matriculas == null)
+{
+	<p><em>Cargando...</em></p>
+}
+else if(!matriculas.Any())
+{
+	<p><em>No hay matriculas registradas.</em></p>
+}
+else
+{
+	<table class="table table-striped table-bordered">
+		<thead class="thead-dark">
+			<tr>
+				<th>ID</th>
+				<th>Alumno</th>
+				<th>Curso</th>
+				<th>Estado</th>
+				<th>Fecha de Matricula</th>
+				<th>Acciones</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var item in matriculas)
+			{
+				<tr>
+					<td>@item.Id</td>
+					<td>@item.AlumnoNombre</td>
+					<td>@item.CursoNombre</td>
+					<td>@item.Estado</td>
+					<td>@item.FechaMatricula.ToString("dd/MM/yyyy")</td>
+					<td>
+						<button class="btn btn-warning" @onclick="() => EditarMatricula(item.Id)">
+							Actualizar
+						</button>
+						<button class="btn btn-danger" @onclick="() => EliminarMatricula(item.Id)">
+							Eliminar
+						</button>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+
+
+
+@code {
+	private IEnumerable<MatriculaDto> matriculas;
+
+	protected override async Task OnInitializedAsync()
+	{ 
+		try
+		{
+			matriculas = await MatriculaService.ObtenerTodasLasMatriculasAsync();
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error al obtener las matriculas: {ex.Message}");
+		}
+	}
+
+	private void AgregarMatricula()
+	{
+		NavigationManager.NavigateTo(Rutas.MatriculaNuevo);
+	}
+
+	private void EditarMatricula(int id)
+	{
+		NavigationManager.NavigateTo($"/matricula/{id}");
+	}
+
+	private async Task EliminarMatricula(int id)
+	{
+		try
+		{
+			// Primero obtenemos la matrícula
+			var matricula = matriculas.FirstOrDefault(m => m.Id == id);
+			if (matricula != null)
+			{
+				// Verificamos si la matrícula está en estado "Cancelada"
+				if (matricula.Estado != "Cancelada")
+				{
+					// Si no está en estado "Cancelada", mostramos un mensaje de error
+					Console.WriteLine("Solo se puede eliminar una matrícula si está en estado 'Cancelada'.");
+					return;
+				}
+
+				// Llamamos al servicio para eliminar la matrícula
+				await MatriculaService.EliminarMatriculaAsync(id);
+
+				// Actualizamos la lista de matrículas
+				matriculas = await MatriculaService.ObtenerTodasLasMatriculasAsync();
+			}
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error al eliminar la matrícula: {ex.Message}");
+		}
+	}
+}

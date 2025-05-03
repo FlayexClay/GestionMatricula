@@ -1,0 +1,61 @@
+﻿@using GestionMatricula.Dto
+@using GestionMatricula.Servicio.Interfaces
+@attribute [Route(Rutas.Alumno)]
+@inject IAlumnoService AlumnoService
+@inject NavigationManager navigationManager
+
+<h3>Listado de Alumnos</h3>
+
+<button class="btn btn-primary mb-3" @onclick="AgregarAlumno">Agregar Alumno</button>
+@if (alumnos == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else if (!alumnos.Any()) { 
+    <p><em>No hay alumnos registrados.</em></p>
+}
+else{
+    <table class="table table-striped table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in alumnos)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.Nombre</td>
+                    <td>@item.Apellido</td>
+                    <td>@item.Email</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+	private IEnumerable<AlumnoDto> alumnos;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Obtener el listado de alumnos desde el servicio
+            alumnos = await AlumnoService.ObtenerTodosLosAlumnosAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al obtener los alumnos: {ex.Message}");
+        }
+    }
+
+    private void AgregarAlumno()
+    {
+        navigationManager.NavigateTo(Rutas.AlumnoNuevo);
+    }
+}

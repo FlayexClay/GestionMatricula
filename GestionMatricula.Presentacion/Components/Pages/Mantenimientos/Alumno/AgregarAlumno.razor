@@ -1,0 +1,74 @@
+﻿@using GestionMatricula.Dto
+@using GestionMatricula.Servicio.Interfaces
+@attribute [Route(Rutas.AlumnoNuevo)]
+@inject IAlumnoService AlumnoService
+@inject NavigationManager NavigationManager
+
+<h3>Agregar Alumno</h3>
+
+<EditForm Model="@alumnoDto" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="Nombre" class="form-label">Nombre</label>
+        <InputText id="Nombre" class="form-control" @bind-Value="alumnoDto.Nombre" />
+        <ValidationMessage For="@(() => alumnoDto.Nombre)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="Apellido" class="form-label">Apellido</label>
+        <InputText id="Apellido" class="form-control" @bind-Value="alumnoDto.Apellido" />
+        <ValidationMessage For="@(() => alumnoDto.Apellido)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="Email" class="form-label">Email</label>
+        <InputText id="Email" class="form-control" @bind-Value="alumnoDto.Email" />
+        <ValidationMessage For="@(() => alumnoDto.Email)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Agregar Alumno</button>
+</EditForm>
+
+@if (isSuccess)
+{
+    <div class="alert alert-success mt-3" role="alert">
+        Alumno agregado exitosamente.
+    </div>
+}
+
+@if (isError)
+{
+    <div class="alert alert-danger mt-3" role="alert">
+        Hubo un error al agregar el alumno.
+    </div>
+}
+@code {
+    private AlumnoDto alumnoDto = new();
+    private bool isSuccess = false;
+    private bool isError = false;
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            // Llamada al servicio para agregar el alumno
+            await AlumnoService.CrearAlumnoAsync(alumnoDto);
+            isSuccess = true;
+            isError = false;
+
+            // Limpiar el formulario
+            alumnoDto = new AlumnoDto();
+
+            // Redirigir al listado de alumnos
+            NavigationManager.NavigateTo(Rutas.Alumno); // Ruta de la página de listado de alumnos
+        }
+        catch (Exception ex)
+        {
+            isError = true;
+            isSuccess = false;
+            Console.WriteLine($"Error al agregar el alumno: {ex.Message}"); // Agregar detalles del error
+        }
+    }
+}

@@ -1,0 +1,57 @@
+﻿@page "/matricula/{Id:int}"
+@using GestionMatricula.Dto
+@using GestionMatricula.Servicio.Interfaces
+@inject IMatriculaService MatriculaService
+@inject NavigationManager NavigationManager
+
+<h3>Editar Matrícula</h3>
+
+<EditForm Model="@matriculaDto" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="Estado" class="form-label">Estado</label>
+        <select id="Estado" class="form-control" @bind="matriculaDto.Estado">
+            <option value="Activa">Activa</option>
+            <option value="Cancelada">Cancelada</option>
+            <option value="Finalizada">Finalizada</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Actualizar Matrícula</button>
+</EditForm>
+
+@code {
+    private MatriculaDto matriculaDto;
+
+    [Parameter]
+    public int Id { get; set; } 
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Obtener la matrícula por ID
+            matriculaDto = await MatriculaService.ObtenerMatriculaPorIdAsync(Id);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al obtener la matrícula: {ex.Message}");
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            // Llamada para actualizar la matrícula
+            await MatriculaService.ActualizarEstadoMatriculaAsync(matriculaDto.Id, matriculaDto.Estado);
+            NavigationManager.NavigateTo(Rutas.Matricula); // Redirige al listado de matrículas
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al actualizar la matrícula: {ex.Message}");
+        }
+    }
+}

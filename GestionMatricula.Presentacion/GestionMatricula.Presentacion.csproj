@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Blazor.Bootstrap" Version="3.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AccesoDatos\GestionMatricula.AccesoDatos.csproj" />
+    <ProjectReference Include="..\GestionMatricula.Dto\GestionMatricula.Dto.csproj" />
+    <ProjectReference Include="..\GestionMatricula.Repositorios\GestionMatricula.Repositorios.csproj" />
+    <ProjectReference Include="..\Servicio\GestionMatricula.Servicio.csproj" />
+  </ItemGroup>
+
+</Project>

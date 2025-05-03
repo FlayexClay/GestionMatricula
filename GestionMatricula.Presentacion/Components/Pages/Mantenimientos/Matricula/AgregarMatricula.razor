@@ -1,0 +1,75 @@
+﻿@using GestionMatricula.Dto
+@using GestionMatricula.Servicio.Interfaces
+@attribute [Route(Rutas.MatriculaNuevo)]
+@inject IAlumnoService AlumnoService
+@inject ICursoService CursoService
+@inject IMatriculaService MatriculaService
+@inject NavigationManager NavigationManager
+
+<h3>Agregar Matricula</h3>
+
+<EditForm Model="@matriculaDto" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="AlumnoId" class="form-label">Seleccionar Alumno</label>
+        <select id="AlumnoId" class="form-control" @bind="matriculaDto.AlumnoId">
+            <option value="">Seleccione un Alumno</option>
+            @foreach (var alumno in alumnos)
+            {
+                <option value="@alumno.Id">@alumno.Nombre @alumno.Apellido</option>
+            }
+        </select>
+        <ValidationMessage For="@(() => matriculaDto.AlumnoId)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="CursoId" class="form-label">Seleccionar Curso</label>
+        <select id="CursoId" class="form-control" @bind="matriculaDto.CursoId">
+            <option value="">Seleccione un Curso</option>
+            @foreach (var curso in cursos)
+            {
+                <option value="@curso.Id">@curso.Nombre</option>
+            }
+        </select>
+        <ValidationMessage For="@(() => matriculaDto.CursoId)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="Estado" class="form-label">Estado</label>
+        <select id="Estado" class="form-control" @bind="matriculaDto.Estado">
+            <option value="Activa">Activa</option>
+            <option value="Cancelada">Cancelada</option>
+            <option value="Finalizada">Finalizada</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Agregar Matrícula</button>
+</EditForm>
+
+@code {
+	private MatriculaDto matriculaDto = new();
+    private IEnumerable<AlumnoDto> alumnos = new List<AlumnoDto>();
+    private IEnumerable<CursoDto> cursos = new List<CursoDto>();
+
+	protected override async Task OnInitializedAsync()
+	{ 
+		alumnos = await AlumnoService.ObtenerTodosLosAlumnosAsync();
+		cursos = await CursoService.ObtenerTodosLosCursosAsync();
+	}
+
+	private async Task HandleValidSubmit()
+	{ 
+		try
+		{
+			await MatriculaService.CrearMatriculaAsync(matriculaDto);
+			NavigationManager.NavigateTo(Rutas.Matricula);
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error al agregar matricula: {ex.Message}");
+		}
+	}
+
+}

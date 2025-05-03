@@ -1,0 +1,68 @@
+﻿@using GestionMatricula.Dto
+@using GestionMatricula.Servicio.Interfaces
+@attribute [Route(Rutas.CursoNuevo)]
+@inject ICursoService CursoService
+@inject NavigationManager navigationManager
+
+<h3>Agregar Curso</h3>
+
+<EditForm Model="@cursoDto" OnValidSubmit="HandleValidSubmit">
+	<DataAnnotationsValidator />
+	<ValidationSummary />
+
+	<div class="mb-3">
+		<label for="Nombre" class="form-label">Nombre del Curso</label>
+		<InputText id="Nombre" class="form-control" @bind-Value="cursoDto.Nombre" />
+		<ValidationMessage For="@(() => cursoDto.Nombre)" />
+	</div>
+
+	<div class="mb-3">
+		<label for="Descripcion" class="form-label">Descripción del Curso</label>
+		<InputTextArea id="Descripcion" class="form-control" @bind-Value="cursoDto.Descripcion" />
+		<ValidationMessage For="@(() => cursoDto.Descripcion)" />
+	</div>
+
+	<button type="submit" class="btn btn-primary">Agregar Curso</button>
+
+</EditForm>
+
+@if (isSuccess)
+{
+	<div class="alert alert-success mt-3" role="alert">
+		Curso agregado exitosamente.
+	</div>
+}
+
+@if (isError)
+{
+	<div class="alert alert-danger mt-3" role="alert">
+		Hubo un error al agregar el curso.
+	</div>
+}
+
+@code {
+
+	private CursoDto cursoDto = new();
+	private bool isSuccess = false;
+	private bool isError = false;
+
+	private async Task HandleValidSubmit()
+	{ 
+		try
+		{
+			await CursoService.CrearCursoAsync(cursoDto);
+			isSuccess = true;
+			isError = false;
+
+			cursoDto = new CursoDto();
+
+			navigationManager.NavigateTo(Rutas.Curso);
+		}
+		catch (Exception ex)
+		{
+			isError = true;
+			isSuccess = false;
+		}
+	}
+
+}
